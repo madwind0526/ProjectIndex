@@ -54,9 +54,13 @@ export function SettingsPage({ settings, health, hiddenCount, onSaved, onRestore
   }
 
   async function restore() {
-    const { restored } = await api.restoreHidden();
-    onRestored();
-    setMessage(`숨겼던 프로젝트 ${restored}개를 다시 표시합니다.`);
+    try {
+      const { restored } = await api.restoreHidden();
+      onRestored();
+      setMessage(`숨겼던 프로젝트 ${restored}개를 다시 표시합니다.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "숨긴 프로젝트를 복원하지 못했습니다.");
+    }
   }
 
   return <section className="standard-page page-scroll settings-page"><div className="page-heading"><span className="eyebrow">SETTINGS</span><h1>설정</h1><p>요약을 만들 LLM, 카드 이미지를 만들 ComfyUI, 프로젝트를 찾을 폴더를 설정합니다.</p></div>

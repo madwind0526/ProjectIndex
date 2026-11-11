@@ -10,7 +10,7 @@ import { IMAGE_DIR, ROOT, loadOverrides, loadSettings, patchOverride, restoreHid
 import { githubRepoOf, scanLocal, slug } from "./scan.mjs";
 import { listGithubRepos } from "./github.mjs";
 import { analyseProject, isCommandInstalled } from "./llm.mjs";
-import { COMFY_AUTO_ORDER, generateComfyImage, listComfyModels, startComfyUi } from "./comfy.mjs";
+import { generateComfyImage, listComfyModels, startComfyUi } from "./comfy.mjs";
 import { loadEnvFile, envValue } from "./env.mjs";
 
 loadEnvFile(ROOT);
@@ -134,12 +134,14 @@ async function makeImage(project, settings, prompt) {
 
 /** Refresh = re-read facts (always, since every list call scans) + LLM text unless hand-edited + image when missing. */
 async function refreshProject(id, { images = true, overwrite = false, onlyIfChanged = false } = {}) {
-  const { project, settings } = await findProject(id, { force: true });
+  // Update All has just re-read GitHub for the whole list, so only a single-card refresh forces it again.
+  const { project, settings } = await findProject(id, { force: !onlyIfChanged });
+  const saved = { ...((await loadOverrides())[id] ?? {}) };
   const notes = [];
   let imagePrompt = "";
   // Update All skips the (slow) LLM when the README/description it would read is the same as at the last analysis.
   const sourceHash = createHash("sha1").update(JSON.stringify([project._readme, project._pkgDescription, project._githubDescription])).digest("hex");
-  const unchanged = onlyIfChanged && project.analyzed && (await loadOverrides())[id]?.sourceHash === sourceHash;
+  const unchanged = onlyIfChanged && project.analyzed && saved.sourceHash === sourceHash;
   if (settings.llmProvider !== "none" && (overwrite || !project.edited) && !unchanged) {
     try {
       const result = await analyseProject(settings, { name: project.name, pkgDescription: project._pkgDescription, githubDescription: project._githubDescription, language: project.language, readme: project._readme });
@@ -148,18 +150,19 @@ async function refreshProject(id, { images = true, overwrite = false, onlyIfChan
       if (result.detail) patch.detail = result.detail;
       if (result.category) patch.category = result.category;
       await patchOverride(id, patch);
+      Object.assign(saved, patch);
       imagePrompt = result.imagePrompt;
     } catch (error) {
       notes.push(`LLM 분석 실패: ${error.message}`);
     }
   } else if (settings.llmProvider === "none") notes.push("LLM이 선택되지 않아 요약은 갱신하지 않았습니다.");
   // The picture is redrawn when it is missing or the summary changed since it was made (LLM rewrite or a hand edit).
-  const current = (await findProject(id)).project;
-  const saved = (await loadOverrides())[id] ?? {};
-  if (images && (!current.imageUrl || saved.imageSummary !== current.summary)) {
+  // The summary now in effect is the one just written, or the one scanned a moment ago; no second scan is needed.
+  const summary = saved.summary ?? project.summary;
+  if (images && (!project.imageUrl || saved.imageSummary !== summary)) {
     // A stored scene prompt belongs to LLM text; after a hand edit the summary itself is the better description.
-    const scene = imagePrompt || (current.edited ? "" : saved.imagePrompt ?? "");
-    try { await makeImage(current, settings, scene); } catch (error) { notes.push(`이미지 생성 실패: ${error.message}`); }
+    const scene = imagePrompt || (project.edited ? "" : saved.imagePrompt ?? "");
+    try { await makeImage({ id, name: project.name, summary }, settings, scene); } catch (error) { notes.push(`이미지 생성 실패: ${error.message}`); }
   }
   return { project: publicItem((await findProject(id)).project), notes };
 }
@@ -323,7 +326,8 @@ async function route(request, response, url) {
 
 function serveStatic(response, pathname) {
   let file = path.join(WEB_DIST, pathname === "/" ? "index.html" : pathname);
-  if (!file.startsWith(WEB_DIST)) throw new HttpError(403, "허용되지 않은 경로입니다.");
+  // Compare with a trailing separator so a sibling folder such as "dist-evil" does not pass the prefix test.
+  if (file !== WEB_DIST && !file.startsWith(WEB_DIST + path.sep)) throw new HttpError(403, "허용되지 않은 경로입니다.");
   if (!existsSync(file) || statSync(file).isDirectory()) file = path.join(WEB_DIST, "index.html");
   if (!existsSync(file)) throw new HttpError(404, "빌드된 화면이 없습니다. npm run build 후 다시 실행하거나 start.bat(개발 모드)을 사용하세요.");
   response.writeHead(200, { "Content-Type": MIME[path.extname(file)] ?? "application/octet-stream" });
@@ -339,4 +343,8 @@ const server = createServer((request, response) => {
   });
 });
 
+server.on("error", (error) => {
+  console.error(error.code === "EADDRINUSE" ? `포트 ${PORT}가 이미 사용 중입니다. stop.bat으로 이전 서버를 종료한 뒤 다시 실행하세요.` : error);
+  process.exit(1);
+});
 server.listen(PORT, "127.0.0.1", () => console.log(`Project Index API: http://127.0.0.1:${PORT}`));

@@ -1,3 +1,7 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
+import { spawn } from "cross-spawn";
+
 const first = (names, patterns) => {
   for (const pattern of patterns) {
     const found = names.find((name) => pattern.test(name));

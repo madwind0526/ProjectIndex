@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
+import { createHash } from "node:crypto";
 
 const run = promisify(execFile);
 const SKIP = /^(memory-bank|_template|node_modules)$|\.worktrees$|^\./i;
@@ -83,7 +84,11 @@ export async function scanLocal(roots) {
   // Two roots can hold a folder of the same name; the later one gets a drive suffix so ids stay unique.
   const seen = new Set();
   for (const project of projects) {
-    if (seen.has(project.id)) project.id = `${project.id}-${project.path[0].toLowerCase()}`;
+    if (seen.has(project.id)) {
+      const byDrive = `${project.id}-${project.path[0].toLowerCase()}`;
+      // Same name on the same drive too: fall back to a short hash of the full path.
+      project.id = seen.has(byDrive) ? `${project.id}-${createHash("sha1").update(project.path).digest("hex").slice(0, 6)}` : byDrive;
+    }
     seen.add(project.id);
   }
   return projects;

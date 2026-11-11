@@ -1,5 +1,5 @@
 import { ExternalLink, FolderOpen, ImagePlus, Loader2, Pencil, Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { api } from "../api";
 import type { Project } from "../types";
@@ -17,7 +17,8 @@ type Draft = Pick<Project, "name" | "category" | "summary" | "detail" | "release
 const toDraft = (p: Project): Draft => ({ name: p.name, category: p.category, summary: p.summary, detail: p.detail, releaseDate: p.releaseDate, link: p.link, github: p.github, hasLlm: p.hasLlm, hasDocs: p.hasDocs, hasRelease: p.hasRelease });
 
 const Row = ({ label, children }: { label: string; children: React.ReactNode }) => <div className="meta-row"><dt>{label}</dt><dd>{children}</dd></div>;
-const Url = ({ href }: { href: string }) => (href ? <a href={href} target="_blank" rel="noopener noreferrer">{href}<ExternalLink size={11} /></a> : <span className="muted">없음</span>);
+// Only http(s) addresses become links, so a typed "javascript:..." value is shown as plain text.
+const Url = ({ href }: { href: string }) => (/^https?:\/\//i.test(href) ? <a href={href} target="_blank" rel="noopener noreferrer">{href}<ExternalLink size={11} /></a> : href ? <span>{href}</span> : <span className="muted">없음</span>);
 
 export function ProjectDialog({ project, categories, onClose, onChanged }: Props) {
   const [editing, setEditing] = useState(false);
@@ -28,6 +29,12 @@ export function ProjectDialog({ project, categories, onClose, onChanged }: Props
   // A saved category that was later removed from settings must still be selectable, or the select would silently change it.
   const options = categories.includes(draft.category) ? categories : [...categories, draft.category];
 
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   async function guarded(work: () => Promise<void>) {
     setBusy(true);
     setMessage("");
@@ -35,7 +42,7 @@ export function ProjectDialog({ project, categories, onClose, onChanged }: Props
   }
   const save = () => guarded(async () => {
     // Link/GitHub typed over with an empty string go back to the detected value (null clears the override).
-    const result = await api.update(project.id, { ...draft, link: draft.link || null as never, github: draft.github || null as never, releaseDate: draft.releaseDate || null as never, edited: true });
+    const result = await api.update(project.id, { ...draft, link: draft.link || null, github: draft.github || null, releaseDate: draft.releaseDate || null, edited: true });
     onChanged(result.project);
     setDraft(toDraft(result.project));
     setEditing(false);
@@ -56,11 +63,11 @@ export function ProjectDialog({ project, categories, onClose, onChanged }: Props
             <span className="eyebrow">{project.category.toUpperCase()}</span>
             {editing ? <input className="title-input" value={draft.name} onChange={(e) => set("name", e.target.value)} aria-label="이름" /> : <h2>{project.name}</h2>}
           </div>
-          <button type="button" className="icon-button" onClick={onClose} aria-label="닫기"><X size={16} /></button>
+          <button type="button" className="icon-button" onClick={onClose} aria-label="닫기" autoFocus><X size={16} /></button>
         </header>
 
         <div className="dialog-body">
-          {project.imageUrl && !editing && <img className="dialog-image" src={project.imageUrl} alt="" />}
+          {project.imageUrl && !editing && <div className="dialog-image-wrap" style={{ backgroundImage: `url(${project.imageUrl})` }}><img className="dialog-image" src={project.imageUrl} alt="" /></div>}
           {editing ? (
             <div className="form-grid">
               <label className="form-field"><span>카테고리</span><select value={draft.category} onChange={(e) => set("category", e.target.value)}>{options.map((c) => <option key={c}>{c}</option>)}</select></label>

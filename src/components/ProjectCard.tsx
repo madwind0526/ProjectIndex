@@ -29,7 +29,7 @@ export function ProjectCard({ project, busy, actions }: { project: Project; busy
   };
   const canRun = project.inLocal && project.hasStart;
   return (
-    <article className={`project-card${project.working ? " working" : ""}${project.inGithub ? (project.isPrivate ? " private" : " public") : ""}`} onClick={() => actions.onOpen(project)} tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter") actions.onOpen(project); }}>
+    <article className={`project-card${project.working ? " working" : ""}${project.inGithub ? (project.isPrivate ? " private" : " public") : ""}`} role="button" aria-label={`${project.name} 상세 보기`} onClick={() => actions.onOpen(project)} tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter") actions.onOpen(project); }}>
       <div className="card-image">
         {project.imageUrl ? <img src={project.imageUrl} alt="" loading="lazy" /> : <span className="card-image-empty">{project.name.slice(0, 2).toUpperCase()}</span>}
         <button type="button" className={`card-btn card-star ${project.favorite ? "on" : ""}`} onClick={stop(actions.onFavorite)} aria-label={project.favorite ? "즐겨찾기 해제" : "즐겨찾기"} title="즐겨찾기">

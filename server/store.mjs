@@ -74,7 +74,15 @@ export const loadOverrides = () => readJson(PROJECTS_FILE, {});
 /** Fields a user (or the LLM) may set on a project card; everything else is derived from disk/GitHub. */
 const PATCH_FIELDS = ["favorite", "hidden", "edited", "name", "summary", "detail", "category", "releaseDate", "link", "github", "hasLlm", "hasDocs", "hasRelease", "imagePrompt", "working", "analyzed", "sourceHash", "imageSummary"];
 
-export async function patchOverride(id, patch) {
+// Read-modify-write of projects.json runs one at a time, so a refresh and a favourite toggle cannot overwrite each other.
+let writeQueue = Promise.resolve();
+const serial = (work) => {
+  const run = writeQueue.then(work);
+  writeQueue = run.catch(() => {});
+  return run;
+};
+
+export const patchOverride = (id, patch) => serial(async () => {
   const all = await loadOverrides();
   const next = { ...(all[id] ?? {}) };
   for (const key of PATCH_FIELDS) {
@@ -86,12 +94,12 @@ export async function patchOverride(id, patch) {
   all[id] = next;
   await writeJson(PROJECTS_FILE, all);
   return next;
-}
+});
 
-export async function restoreHidden() {
+export const restoreHidden = () => serial(async () => {
   const all = await loadOverrides();
   let count = 0;
   for (const entry of Object.values(all)) if (entry.hidden) { delete entry.hidden; count += 1; }
   await writeJson(PROJECTS_FILE, all);
   return count;
-}
+});

@@ -12,7 +12,7 @@ const base = (id: string) => `/api/projects/${encodeURIComponent(id)}`;
 
 export const api = {
   list: (refresh = false) => request<ProjectList>(`/api/projects${refresh ? "?refresh=1" : ""}`),
-  update: (id: string, patch: Partial<Project> & { imagePrompt?: string | null }) => request<{ project: Project }>(base(id), send("PUT", patch)),
+  update: (id: string, patch: Partial<Omit<Project, "link" | "github" | "releaseDate">> & { link?: string | null; github?: string | null; releaseDate?: string | null }) => request<{ project: Project }>(base(id), send("PUT", patch)),
   remove: (id: string) => request<{ ok: true }>(base(id), send("DELETE")),
   refresh: (id: string, { images = true, force = false, changed = false } = {}) => request<{ project: Project; notes: string[] }>(`${base(id)}/refresh?images=${images ? 1 : 0}&force=${force ? 1 : 0}&changed=${changed ? 1 : 0}`, send("POST")),
   run: (id: string) => request<{ ok: true }>(`${base(id)}/run`, send("POST")),
