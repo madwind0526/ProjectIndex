@@ -1,0 +1,485 @@
+/* Project Index specific layout: toolbar, cards, popup. Tokens come from styles.css. */
+
+.standard-page {
+  flex: 1;
+  min-height: 0;
+  padding: 28px 28px 36px;
+}
+
+.settings-page {
+  max-width: 1040px;
+}
+
+.llm-provider {
+  margin-left: 4px;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-style: normal;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 16px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 220px;
+  padding: 0 11px;
+  border: 1px solid #3b3547;
+  border-radius: var(--radius);
+  background: #1e1b25;
+  color: var(--faint);
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  outline: none;
+  font-size: 11.5px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  gap: 6px;
+}
+
+.chip {
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+}
+
+.chip.active {
+  border-color: #584472;
+  background: var(--accent-soft);
+  color: #d7c2ff;
+  font-weight: 650;
+}
+
+.form-message {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border: 1px solid #5b3140;
+  border-radius: var(--radius);
+  background: rgba(235, 143, 154, 0.08);
+  color: var(--red);
+  font-size: 11px;
+}
+
+.empty-hint {
+  padding: 28px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--faint);
+  text-align: center;
+}
+
+/* ---------- cards ---------- */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.project-card:hover,
+.project-card:focus-visible {
+  border-color: var(--accent-2);
+  transform: translateY(-2px);
+}
+
+.card-image {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(145deg, #2a2140, #17141d);
+}
+
+.card-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-image-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #4b4065;
+  font: 600 34px/1 var(--mono);
+  letter-spacing: 2px;
+}
+
+.card-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #ffffff22;
+  border-radius: 7px;
+  background: #0d0c12b8;
+  backdrop-filter: blur(4px);
+  color: #e6dcf5;
+}
+
+.card-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: #332743;
+}
+
+.card-btn.danger:hover:not(:disabled) {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.card-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.card-star {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
+
+.card-star.on {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.card-star.on svg {
+  fill: currentColor;
+}
+
+.card-tools {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 5px;
+}
+
+.card-body {
+  display: grid;
+  gap: 8px;
+  padding: 13px 14px 14px;
+}
+
+.card-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-title h3 {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-where {
+  flex: 0 0 auto;
+  color: var(--faint);
+  font-size: 9px;
+}
+
+.card-summary {
+  display: -webkit-box;
+  min-height: 3em;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11.5px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 9.5px;
+}
+
+.tag.on {
+  border-color: #356048;
+  background: rgba(128, 201, 160, 0.1);
+  color: var(--green);
+}
+
+.tag.off {
+  color: var(--faint);
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.tag.category {
+  border-color: #584472;
+  background: var(--accent-soft);
+  color: #d7c2ff;
+}
+
+/* ---------- popup ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: #08060bbd;
+  backdrop-filter: blur(4px);
+}
+
+.project-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: hidden;
+  border: 1px solid #4a3c5b;
+  border-radius: 8px;
+  background: #17141d;
+  box-shadow: 0 24px 80px #000c;
+}
+
+.project-dialog > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-dialog > header h2 {
+  margin: 4px 0 0;
+  font-size: 17px;
+  font-weight: 550;
+}
+
+.title-input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 10px;
+  border: 1px solid #3b3547;
+  border-radius: var(--radius);
+  background: #1e1b25;
+  font-size: 15px;
+}
+
+.icon-button {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #3d3549;
+  border-radius: 7px;
+  background: #211d29;
+  color: #a99db6;
+}
+
+.icon-button:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.dialog-body {
+  display: grid;
+  gap: 12px;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.dialog-image {
+  width: 100%;
+  max-height: 260px;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.dialog-summary {
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.dialog-heading {
+  margin-top: 4px;
+  color: var(--faint);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+}
+
+.dialog-detail {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.meta {
+  display: grid;
+  gap: 1px;
+  margin: 6px 0 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--border);
+}
+
+.meta-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--surface);
+  font-size: 11.5px;
+}
+
+.meta dt {
+  color: var(--faint);
+}
+
+.meta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.meta a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent);
+}
+
+.meta code {
+  font: 11px var(--mono);
+}
+
+.muted {
+  color: var(--faint);
+}
+
+.project-dialog > footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.ghost-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ghost-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid #3b3547;
+  border-radius: var(--radius);
+  background: #1e1b25;
+  font-size: 11.5px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.form-field textarea:focus {
+  outline: none;
+  border-color: #7654a8;
+}
+
+.check-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  grid-column: 1 / -1;
+}
+
+.check-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+}
+
+.form-hint {
+  grid-column: 1 / -1;
+  color: var(--faint);
+  font-size: 9.5px;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+  .nav-item span,
+  .brand-copy,
+  .local-status,
+  .privacy,
+  .nav-caption {
+    display: none;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

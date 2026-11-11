@@ -1,0 +1,132 @@
+/* Working checkbox, GitHub visibility colours and the markdown viewer. */
+
+.card-working {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 7px;
+  border: 1px solid #ffffff22;
+  border-radius: 7px;
+  background: #0d0c12b8;
+  backdrop-filter: blur(4px);
+  color: #e6dcf5;
+  font-size: 10.5px;
+  cursor: pointer;
+}
+
+.card-working input {
+  margin: 0;
+  accent-color: var(--sky);
+}
+
+/* GitHub visibility: green = public, amber = private (also on the card's top edge). */
+.project-card.public {
+  border-top: 3px solid var(--green);
+}
+
+.project-card.private {
+  border-top: 3px solid var(--amber);
+}
+
+.vis {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.vis.public {
+  background: rgba(128, 201, 160, 0.14);
+  color: var(--green);
+}
+
+.vis.private {
+  background: rgba(228, 189, 114, 0.14);
+  color: var(--amber);
+}
+
+/* Working cards: sky-blue frame and glow so they stand out from the rest. */
+.project-card.working {
+  border-color: var(--sky);
+  background: linear-gradient(180deg, #1a2433, var(--surface) 55%);
+  box-shadow: 0 0 0 1px var(--sky), 0 0 22px rgba(142, 197, 255, 0.28);
+}
+
+.project-card.working .card-working {
+  border-color: var(--sky);
+  background: #1d3350e6;
+  color: var(--sky);
+  font-weight: 650;
+}
+
+/* ---------- markdown viewer ---------- */
+
+.markdown {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.markdown > :first-child {
+  margin-top: 0;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  margin: 16px 0 6px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 4px 0 8px;
+  padding-left: 20px;
+}
+
+.markdown p {
+  margin: 0 0 8px;
+}
+
+.markdown code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #272131;
+  color: #d8c9ee;
+  font: 11px var(--mono);
+}
+
+.markdown pre {
+  overflow-x: auto;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #1e1b25;
+}
+
+.markdown pre code {
+  padding: 0;
+  background: none;
+}
+
+.markdown a {
+  color: var(--accent);
+}
+
+.markdown blockquote {
+  margin: 8px 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--border);
+}
+
+/* Card background by state: amber tint = GitHub private, blue tint = working (working wins when both apply). */
+.project-card.private {
+  background: linear-gradient(180deg, #3a2e17 0%, #261f12 100%);
+}
+
+.project-card.working {
+  background: linear-gradient(180deg, #1c3a5e 0%, #14263d 100%);
+}

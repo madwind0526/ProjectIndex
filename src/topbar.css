@@ -1,0 +1,63 @@
+/* Centered search + sort icons in the top bar. */
+
+.top-search {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.top-search .search-box {
+  width: min(420px, 100%);
+}
+
+.search-box button {
+  display: grid;
+  place-items: center;
+  padding: 2px;
+  border: 0;
+  background: none;
+  color: var(--faint);
+}
+
+.search-box button:hover {
+  color: var(--text);
+}
+
+.sort-group {
+  display: flex;
+  gap: 4px;
+}
+
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.sort-btn i {
+  font-size: 11px;
+  font-style: normal;
+}
+
+.sort-btn:hover {
+  border-color: var(--accent);
+}
+
+.sort-btn.active {
+  border-color: #584472;
+  background: var(--accent-soft);
+  color: #d7c2ff;
+}
+
+.top-search ~ .server-summary {
+  margin-left: 0;
+}

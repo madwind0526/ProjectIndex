@@ -1,0 +1,31 @@
+{
+  "name": "project-index",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n api,web -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "node --watch server/index.mjs",
+    "dev:web": "vite --host 127.0.0.1 --port 5189 --strictPort",
+    "build": "tsc -b && vite build",
+    "start": "node server/index.mjs",
+    "typecheck": "tsc -b --pretty",
+    "check": "node --check server/index.mjs && node --check server/scan.mjs && node --check server/github.mjs && node --check server/store.mjs && node --check server/env.mjs && node --check server/llm.mjs && node --check server/comfy.mjs",
+    "test": "npm run check && node --test \"server/*.test.mjs\""
+  },
+  "dependencies": {
+    "cross-spawn": "^7.0.6",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-markdown": "^10.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "concurrently": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  }
+}
